@@ -1,0 +1,24 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "DMVPuzzlePieces",
+  "Description": "A set of interactable puzzle pieces to build a wide variety of gameplay challenges.",
+  "Category": "Other",
+  "CreatedBy": "DuarteMartinezVizoso",
+  "CreatedByURL": "",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "DMVPuzzlePieces",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
