@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PPTriggerActor.h"
-#include "PPDiscreteTrigger.generated.h"
+#include "PPActorTrigger.h"
+#include "PPActorTrigger_Button.generated.h"
 
 UCLASS(Blueprintable)
-class DMVPUZZLEPIECES_API APPDiscreteTrigger : public APPTriggerActor
+class DMVPUZZLEPIECES_API APPActorTrigger_Button : public APPActorTrigger
 {
 	GENERATED_BODY()
 
 public:
-	APPDiscreteTrigger();
+	APPActorTrigger_Button();
 
 protected:
 	virtual void BeginPlay() override;
