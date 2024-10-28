@@ -7,6 +7,14 @@
 #include "Actor/TriggerActor/PPActorTrigger.h"
 #include "PPActorManager.generated.h"
 
+UENUM()
+enum ESolvingMethod
+{
+	Free,
+	Sequence,
+	MandatoryOrder
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPuzzleCompleted);
 
 UCLASS()
@@ -25,12 +33,24 @@ protected:
 
 	UPROPERTY(EditInstanceOnly)
 	bool bDebug = false;
-	
+
+	// Internal check to see if the puzzle is completed
+	UPROPERTY()
+	bool bPuzzleCompleted = false;
+
+	// When the puzzle is completed, block the Trigger Actors that are part of the puzzle
 	UPROPERTY(EditInstanceOnly)
 	bool bBlockPuzzleOnFinished;
 
 	UPROPERTY(EditInstanceOnly)
-	bool bCanActivate = false;
+	bool bActivate = false;
+
+	// Solving method
+	UPROPERTY(EditInstanceOnly)
+	TEnumAsByte<ESolvingMethod> SolvingMethod = Free;
+
+	UPROPERTY() // This is only used for the Sequence & MandatoryOrder solving method
+	int32 CurrentSolvedIndex = 0;
 	
 	UPROPERTY(EditInstanceOnly)
 	TMap<APPActorTrigger*, int32> PuzzleComponents;
@@ -43,17 +63,8 @@ protected:
 	
 	UFUNCTION()
 	void UpdatePuzzleState();
-
-	bool bPuzzleCompleted = false;
-
-private:
-	// Puzzle name to show in the editor tooltip.
-	UPROPERTY(EditInstanceOnly)
-	FText PuzzleName;
-
-#if WITH_EDITOR
-	// TODO: Why is the PostEditChangeProperty not updating the PuzzleName correctly?
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+	
+	UFUNCTION()
+	void ActivateNextPuzzlePiece();
 	
 };

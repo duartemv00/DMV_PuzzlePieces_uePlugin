@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Actor/PPActor.h"
-#include "Interface/TriggerToFeedback.h"
+#include "Interface/PPTriggerToFeedback.h"
 #include "PPActorFeedback.generated.h"
 
 UCLASS()
-class DMVPUZZLEPIECES_API APPActorFeedback : public APPActor, public ITriggerToFeedback
+class DMVPUZZLEPIECES_API APPActorFeedback : public APPActor, public IPPTriggerToFeedback
 {
 	GENERATED_BODY()
 

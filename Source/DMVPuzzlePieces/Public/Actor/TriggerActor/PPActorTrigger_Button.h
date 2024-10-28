@@ -18,6 +18,7 @@ protected:
 	virtual void BeginPlay() override;
 	void Interact_Implementation() override;
 	int32 GetCurrentValue() override { return CurrentValue; }
+	virtual void ResetPiece() override;
 
 	UPROPERTY()
 	int CurrentValue;

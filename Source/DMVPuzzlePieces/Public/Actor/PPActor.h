@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Actor.h"
-#include "Interface/PPInterface.h"
+#include "Interface/PPManagerToTrigger.h"
 #include "PPActor.generated.h"
 
 UCLASS()
-class DMVPUZZLEPIECES_API APPActor : public AActor, public IPPInterface
+class DMVPUZZLEPIECES_API APPActor : public AActor, public IPPManagerToTrigger
 {
 	GENERATED_BODY()
 
@@ -34,5 +34,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+
+	UPROPERTY(EditInstanceOnly)
+	FText CustomTooltip;
 	
 };

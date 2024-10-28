@@ -52,7 +52,7 @@ void APPActorTrigger_Button::Interact_Implementation()
 	}
 	for (AActor* Actor : ControlledActors) // Send the new value to all connected actors
 	{
-		if(Actor->GetClass()->ImplementsInterface(UPPInterface::StaticClass())) // Cast the actor to the interface
+		if(Actor->GetClass()->ImplementsInterface(UPPManagerToTrigger::StaticClass())) // Cast the actor to the interface
 		{
 			Execute_SendValue(Actor, CurrentValue);
 		} else {
@@ -60,6 +60,12 @@ void APPActorTrigger_Button::Interact_Implementation()
 		}
 	}
 	// END - Feedback to Connected Actors
+}
+
+void APPActorTrigger_Button::ResetPiece()
+{
+	Super::Reset();
+	CurrentValue = DefaultValue;
 }
 
 // NotActiveFeedback_Implementation() is not implemented in this class, but can be implemented in BP

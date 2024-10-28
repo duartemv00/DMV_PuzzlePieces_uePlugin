@@ -13,8 +13,10 @@ void APPActorManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(bCanActivate)
+	// If the manager is not listening to any other manager, it is the root manager
+	if(ListenManagers.Num() == 0)
 	{
+		bActivate = true;
 		TryInitializeManager();
 	}
 
@@ -44,19 +46,28 @@ void APPActorManager::TryInitializeManager()
 {
 	if(ListenManagers.Num() > 0)
 	{
-		bCanActivate = true;
+		bActivate = true; // Assume the manager is active
 		for (APPActorManager* Manager : ListenManagers)
 		{
-			bCanActivate &= Manager->CheckState();
+			bActivate &= Manager->CheckState();
 		}
 	}
-	
-	if(bCanActivate)
+
+	// If the manager is active, activate the puzzle pieces
+	if(bActivate)
 	{
-		// Activate all the pieces related to the manager's puzzle
-		for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
+		CurrentSolvedIndex = 0;
+		// Activate only the first piece
+		if(SolvingMethod == Sequence)
 		{
-			Pair.Key->ActivateOwned();
+			ActivateNextPuzzlePiece();
+		}
+		else {
+			// Activate every piece
+			for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
+			{
+				Pair.Key->ActivateOwned();
+			}
 		}
 	}
 }
@@ -68,14 +79,89 @@ void APPActorManager::TryInitializeManager()
 void APPActorManager::UpdatePuzzleState()
 {
 	bPuzzleCompleted = true; // Assume the puzzle is completed
-
-	// The new code checks the state of the puzzle when the correct answer is set in the manager
-	for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
-	{
-		bPuzzleCompleted &= Pair.Key->GetCurrentValue() == Pair.Value;
-	}
 	
-	if(bPuzzleCompleted) // If all the pieces are in the correct state
+	// Checks if all the pieces are in the correct state
+	switch (SolvingMethod)
+	{
+		case Free:
+			for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
+			{
+				bPuzzleCompleted &= Pair.Key->GetCurrentValue() == Pair.Value;
+			}
+			break;
+
+		// The SEQUENCE solving method is used to solve the puzzle activating one piece at a time.
+		case Sequence:
+			{
+				if(CurrentSolvedIndex == PuzzleComponents.Num() - 1)
+				{
+					bPuzzleCompleted = true;
+					break;
+				}
+
+				bool LastDeactivated = false;
+				int32 CurrentIndex = 0;
+				
+				bPuzzleCompleted = false; // The puzzle is not completed yet
+				
+				for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
+				{
+					if(CurrentIndex == CurrentSolvedIndex)
+					{
+						if (LastDeactivated) {
+							It->Key->ActivateOwned();
+							break;
+						}
+						if(It->Key->GetCurrentValue() == It->Value)
+						{
+							if(!LastDeactivated)
+							{
+								It->Key->DeactivateOwned();
+								CurrentSolvedIndex++;
+								LastDeactivated = true;
+							}
+						}
+					}
+					++CurrentIndex;
+				}
+				break;
+			}
+		
+		// The MANDATORY ORDER solving method is used to solve the puzzle activating the pieces in a specific order.
+		case MandatoryOrder:
+			{
+				if(CurrentSolvedIndex == PuzzleComponents.Num() - 1)
+				{
+					bPuzzleCompleted = true;
+					break;
+				}
+
+				int32 CurrentIndex = 0;
+				
+				bPuzzleCompleted = false; // The puzzle is not completed yet
+				
+				for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
+				{
+					if(CurrentIndex == CurrentSolvedIndex)
+					{
+						if(It->Key->GetCurrentValue() == It->Value)
+						{
+							CurrentSolvedIndex++;
+							break;
+						} 
+						ResetPiece();
+						break;
+					} 
+				}
+			}
+
+		// DEFAULT FOR THE IMPOSSIBLE CASE
+		default:
+			break;
+	}
+
+	// If all the pieces are in the correct state, the puzzle is completed
+	if(bPuzzleCompleted) 
 	{
 		OnPuzzleCompleted.Broadcast();
 		if(bDebug) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Puzzle Completed"));
@@ -91,16 +177,16 @@ void APPActorManager::UpdatePuzzleState()
 	}
 }
 
-#if WITH_EDITOR
-void APPActorManager::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+void APPActorManager::ActivateNextPuzzlePiece()
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(APPActorManager, PuzzleName))
+	int32 CurrentIndex = 0;
+	for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
 	{
-		TextComponent->Text = PuzzleName;
+		if(CurrentIndex == CurrentSolvedIndex)
+		{
+			It->Key->ActivateOwned();
+			break;
+		}
+		++CurrentIndex;
 	}
 }
-#endif

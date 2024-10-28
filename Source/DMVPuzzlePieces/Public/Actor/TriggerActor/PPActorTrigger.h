@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Actor/PPActor.h"
-#include "Interface/Interact.h"
-#include "Interface/TriggerToFeedback.h"
+#include "Interface/PPInteract.h"
+#include "Interface/PPTriggerToFeedback.h"
 #include "PPActorTrigger.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerUpdated);
 
 UCLASS(NotBlueprintable)
-class DMVPUZZLEPIECES_API APPActorTrigger : public APPActor, public IInteract, public ITriggerToFeedback
+class DMVPUZZLEPIECES_API APPActorTrigger : public APPActor, public IPPInteract, public IPPTriggerToFeedback
 {
 	GENERATED_BODY()
 
@@ -22,6 +22,7 @@ public:
 
 	virtual void ActivateOwned() override;
 	virtual void DeactivateOwned() override;
+	virtual void ResetPiece() override;
 
 protected:
 	virtual void BeginPlay() override;

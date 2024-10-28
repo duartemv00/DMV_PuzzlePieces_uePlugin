@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "TriggerToFeedback.generated.h"
+#include "PPTriggerToFeedback.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class UTriggerToFeedback : public UInterface
+class UPPTriggerToFeedback : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,13 +16,12 @@ class UTriggerToFeedback : public UInterface
 /**
  * 
  */
-class DMVPUZZLEPIECES_API ITriggerToFeedback
+class DMVPUZZLEPIECES_API IPPTriggerToFeedback
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	// Send the numeric value of the trigger to the conected actors
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "PuzzlePieces")
 	void SendValue(int Value);
 	

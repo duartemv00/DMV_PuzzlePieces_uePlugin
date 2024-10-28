@@ -24,11 +24,16 @@ void APPActorTrigger::DeactivateOwned()
 	bActive = false;
 }
 
+void APPActorTrigger::ResetPiece()
+{
+	// Reset the trigger
+}
+
 void APPActorTrigger::SendNotActive_Implementation()
 {
 	for (AActor* Actor : ControlledActors)
 	{
-		if(Actor->GetClass()->ImplementsInterface(UTriggerToFeedback::StaticClass()))
+		if(Actor->GetClass()->ImplementsInterface(UPPTriggerToFeedback::StaticClass()))
 		{
 			Execute_NotActive(Actor);
 		} else {

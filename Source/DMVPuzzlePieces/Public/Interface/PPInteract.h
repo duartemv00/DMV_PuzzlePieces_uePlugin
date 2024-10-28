@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Interact.generated.h"
+#include "PPInteract.generated.h"
 
 UINTERFACE()
-class UInteract : public UInterface
+class UPPInteract : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -15,7 +15,7 @@ class UInteract : public UInterface
 /**
  * 
  */
-class DMVPUZZLEPIECES_API IInteract
+class DMVPUZZLEPIECES_API IPPInteract
 {
 	GENERATED_BODY()
 
