@@ -24,17 +24,6 @@ void APPActorTrigger::DeactivateOwned()
 	bActive = false;
 }
 
-bool APPActorTrigger::CheckState()
-{
-	return bValueMatch;
-}
-
-void APPActorTrigger::SendHasCorrectValue()
-{
-	bValueMatch = true;
-	OnTriggerHasCorrectValue.Broadcast();
-}
-
 void APPActorTrigger::SendNotActive_Implementation()
 {
 	for (AActor* Actor : ControlledActors)

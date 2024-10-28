@@ -18,13 +18,12 @@ void APPActorTrigger_Button::BeginPlay()
 	// Check if the configuration of the puzzle piece is correct
 	assert(MinValue<MaxValue);
 	assert(DefaultValue<=MaxValue && DefaultValue>=MinValue);
+
+	// Set the initial current value of the piece
 	CurrentValue = DefaultValue;
 
 	// Check if the puzzle piece is already correct
-	if(CurrentValue == ExpectedValue)
-	{
-		SendHasCorrectValue();
-	}
+	OnTriggerdUpdated.Broadcast();
 }
 
 void APPActorTrigger_Button::Interact_Implementation()
@@ -42,13 +41,9 @@ void APPActorTrigger_Button::Interact_Implementation()
 		CurrentValue = MinValue;
 	}
 	
-	// BEGIN - Comunication with Manager
-	if(CurrentValue == ExpectedValue)
-	{
-		SendHasCorrectValue();
-	} else { bValueMatch = false; }
-	// END - Comunication with Manager
-
+	// Communication with Manager
+	OnTriggerdUpdated.Broadcast(); 
+	
 	// BEGIN - Feedback to Connected Actors
 	if(ControlledActors.Num() == 0) // Exit if there is no actor connected to the piece
 	{

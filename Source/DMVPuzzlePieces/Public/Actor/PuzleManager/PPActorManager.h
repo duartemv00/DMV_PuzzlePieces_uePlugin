@@ -19,13 +19,24 @@ public:
 
 	FPuzzleCompleted OnPuzzleCompleted;
 
-	virtual bool CheckState() override;
-
 protected:
 	virtual void BeginPlay() override;
+	virtual bool CheckState() override;
+
+	UPROPERTY(EditInstanceOnly)
+	bool bDebug = false;
 	
 	UPROPERTY(EditInstanceOnly)
 	bool bBlockPuzzleOnFinished;
+
+	UPROPERTY(EditInstanceOnly)
+	bool bCanActivate = false;
+	
+	UPROPERTY(EditInstanceOnly)
+	TMap<APPActorTrigger*, int32> PuzzleComponents;
+	
+	UPROPERTY(EditInstanceOnly)
+	TArray<APPActorManager*> ListenManagers;
 	
 	UFUNCTION()
 	void TryInitializeManager();
@@ -34,14 +45,15 @@ protected:
 	void UpdatePuzzleState();
 
 	bool bPuzzleCompleted = false;
-	
+
+private:
+	// Puzzle name to show in the editor tooltip.
 	UPROPERTY(EditInstanceOnly)
-	bool bCanActivate = false;
-	
-	UPROPERTY(EditInstanceOnly)
-	TArray<APPActorTrigger*> PuzzleComponents;
-	
-	UPROPERTY(EditInstanceOnly)
-	TArray<APPActorManager*> ListenManagers;
+	FText PuzzleName;
+
+#if WITH_EDITOR
+	// TODO: Why is the PostEditChangeProperty not updating the PuzzleName correctly?
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 	
 };

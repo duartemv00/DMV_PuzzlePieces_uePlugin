@@ -17,8 +17,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void Interact_Implementation() override;
+	int32 GetCurrentValue() override { return CurrentValue; }
 
-private:
 	UPROPERTY()
 	int CurrentValue;
 	UPROPERTY(EditInstanceOnly)
@@ -27,7 +27,4 @@ private:
 	int MinValue;
 	UPROPERTY(EditInstanceOnly)
 	int DefaultValue;
-	UPROPERTY(EditInstanceOnly)
-	int ExpectedValue;
-	
 };

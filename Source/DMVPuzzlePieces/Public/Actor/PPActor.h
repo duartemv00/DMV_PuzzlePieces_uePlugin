@@ -23,6 +23,15 @@ public:
 	
 	APPActor();
 
+	// BEGIN - Getters
+	UTextRenderComponent* GetTextComponent() const { return TextComponent; }
+	UStaticMeshComponent* GetMeshComponent() const { return MeshComponent; }
+	// END - Getters
+
+	// BEGIN - Setters
+	void SetTextComponent(const FString NewText) const { TextComponent->Text = FText::FromString(NewText); }
+	// END - Setters
+
 protected:
 	virtual void BeginPlay() override;
 	

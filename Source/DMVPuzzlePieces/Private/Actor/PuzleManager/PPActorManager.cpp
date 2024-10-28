@@ -19,9 +19,9 @@ void APPActorManager::BeginPlay()
 	}
 
 	// Bind the manager to the puzzle pieces it is managing
-	for (APPActorTrigger* Piece : PuzzleComponents)
+	for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
 	{
-		Piece->OnTriggerHasCorrectValue.AddDynamic(this, &APPActorManager::UpdatePuzzleState);
+		Pair.Key->OnTriggerdUpdated.AddDynamic(this, &APPActorManager::UpdatePuzzleState);
 	}
 
 	// Bin the manager to the managers it is listening to
@@ -31,10 +31,11 @@ void APPActorManager::BeginPlay()
 	}
 }
 
-bool APPActorManager::CheckState()
-{
-	return bPuzzleCompleted;
-}
+/**
+ * Check if the puzzle is completed.
+ * @return True if the puzzle is completed.
+ */
+bool APPActorManager::CheckState() { return bPuzzleCompleted; }
 
 /**
  * Activate the Puzzle Pieces that are part of the puzzle managed by this manager.
@@ -53,9 +54,9 @@ void APPActorManager::TryInitializeManager()
 	if(bCanActivate)
 	{
 		// Activate all the pieces related to the manager's puzzle
-		for (APPActorTrigger* Piece : PuzzleComponents)
+		for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
 		{
-			Piece->ActivateOwned();
+			Pair.Key->ActivateOwned();
 		}
 	}
 }
@@ -66,25 +67,40 @@ void APPActorManager::TryInitializeManager()
  */
 void APPActorManager::UpdatePuzzleState()
 {
-	bPuzzleCompleted = true;
-	for (APPActorTrigger* Piece : PuzzleComponents)
+	bPuzzleCompleted = true; // Assume the puzzle is completed
+
+	// The new code checks the state of the puzzle when the correct answer is set in the manager
+	for (TPair<APPActorTrigger*, int32> Pair : PuzzleComponents)
 	{
-		bPuzzleCompleted &= Piece->CheckState();
+		bPuzzleCompleted &= Pair.Key->GetCurrentValue() == Pair.Value;
 	}
 	
 	if(bPuzzleCompleted) // If all the pieces are in the correct state
 	{
 		OnPuzzleCompleted.Broadcast();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Puzzle Completed"));
+		if(bDebug) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Puzzle Completed"));
 
 		// If the manager has to block the puzzle pieces
 		if(bBlockPuzzleOnFinished)
 		{
-			for (APPActorTrigger* Piece : PuzzleComponents)
+			for (TPair<APPActor*, int32> Pair : PuzzleComponents)
 			{
-				Piece->DeactivateOwned();
+				Pair.Key->DeactivateOwned();
 			}
 		}
 	}
 }
 
+#if WITH_EDITOR
+void APPActorManager::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(APPActorManager, PuzzleName))
+	{
+		TextComponent->Text = PuzzleName;
+	}
+}
+#endif

@@ -8,7 +8,7 @@
 #include "Interface/TriggerToFeedback.h"
 #include "PPActorTrigger.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerHasCorrectValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerUpdated);
 
 UCLASS(NotBlueprintable)
 class DMVPUZZLEPIECES_API APPActorTrigger : public APPActor, public IInteract, public ITriggerToFeedback
@@ -18,25 +18,17 @@ class DMVPUZZLEPIECES_API APPActorTrigger : public APPActor, public IInteract, p
 public:
 	APPActorTrigger();
 
-	FTriggerHasCorrectValue OnTriggerHasCorrectValue;
+	FTriggerUpdated OnTriggerdUpdated;
 
 	virtual void ActivateOwned() override;
 	virtual void DeactivateOwned() override;
 
-	virtual bool CheckState() override;
-
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void SendHasCorrectValue();
 
 	// List of all the Actors that will be affected when this trigger is activated
 	UPROPERTY(EditInstanceOnly)
 	TArray<AActor*> ControlledActors;
-
-	UPROPERTY()
-	bool bValueMatch = false;
 
 	UPROPERTY()
 	bool bActive= false;

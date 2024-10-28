@@ -25,6 +25,8 @@ public:
 	virtual void ActivateOwned() {};
 	
 	virtual void DeactivateOwned() {};
-	
+
 	virtual bool CheckState() { return false; };
+	
+	virtual int32 GetCurrentValue() { return 0; };
 };
