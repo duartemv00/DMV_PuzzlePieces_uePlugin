@@ -56,11 +56,20 @@ void APPActorManager::TryInitializeManager()
 	// If the manager is active, activate the puzzle pieces
 	if(bActivate)
 	{
-		CurrentSolvedIndex = 0;
+		CurrentSolvingIndex = 0;
 		// Activate only the first piece
 		if(SolvingMethod == Sequence)
 		{
-			ActivateNextPuzzlePiece();
+			int32 CurrentIndex = 0;
+			for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
+			{
+				if(CurrentIndex == CurrentSolvingIndex)
+				{
+					It->Key->ActivateOwned();
+					break;
+				}
+				++CurrentIndex;
+			}
 		}
 		else {
 			// Activate every piece
@@ -93,35 +102,31 @@ void APPActorManager::UpdatePuzzleState()
 		// The SEQUENCE solving method is used to solve the puzzle activating one piece at a time.
 		case Sequence:
 			{
-				if(CurrentSolvedIndex == PuzzleComponents.Num() - 1)
-				{
-					bPuzzleCompleted = true;
-					break;
-				}
-
 				bool LastDeactivated = false;
 				int32 CurrentIndex = 0;
 				
-				bPuzzleCompleted = false; // The puzzle is not completed yet
-				
 				for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
 				{
-					if(CurrentIndex == CurrentSolvedIndex)
+					if(CurrentIndex == CurrentSolvingIndex)
 					{
-						if (LastDeactivated) {
+						if (LastDeactivated) { // Iteration +1
+							// Here we only enter when the value of the current trigger is the expected value,
+							// to activate the next trigger (if it exists)
+							bPuzzleCompleted = false; // The puzzle is not completed yet
 							It->Key->ActivateOwned();
 							break;
 						}
-						if(It->Key->GetCurrentValue() == It->Value)
+						if(It->Key->GetCurrentValue() == It->Value) // Trigger value == Expected value?
 						{
-							if(!LastDeactivated)
-							{
-								It->Key->DeactivateOwned();
-								CurrentSolvedIndex++;
-								LastDeactivated = true;
-							}
+							// Deactivate the current trigger
+							It->Key->DeactivateOwned();
+							CurrentSolvingIndex++;
+							LastDeactivated = true;
+						} else {
+							bPuzzleCompleted = false; // The puzzle is not completed yet
 						}
 					}
+					// If we are not in the current piece, iterate one more time.
 					++CurrentIndex;
 				}
 				break;
@@ -130,29 +135,23 @@ void APPActorManager::UpdatePuzzleState()
 		// The MANDATORY ORDER solving method is used to solve the puzzle activating the pieces in a specific order.
 		case MandatoryOrder:
 			{
-				if(CurrentSolvedIndex == PuzzleComponents.Num() - 1)
-				{
-					bPuzzleCompleted = true;
-					break;
-				}
-
 				int32 CurrentIndex = 0;
 				
-				bPuzzleCompleted = false; // The puzzle is not completed yet
-				
-				for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
-				{
-					if(CurrentIndex == CurrentSolvedIndex)
-					{
-						if(It->Key->GetCurrentValue() == It->Value)
-						{
-							CurrentSolvedIndex++;
-							break;
-						} 
-						ResetPiece();
-						break;
-					} 
-				}
+				// for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
+				// {
+				// 	if(CurrentIndex == CurrentSolvingIndex)
+				// 	{
+				// 		if(It->Key->GetCurrentValue() == It->Value)
+				// 		{
+				// 			CurrentSolvingIndex++;
+				// 			break;
+				// 		}
+				// 		ResetPiece();
+				// 		break;
+				// 	}
+				// 	++CurrentIndex; // If we are not in the current piece, iterate one more time.
+				// }
+				break;
 			}
 
 		// DEFAULT FOR THE IMPOSSIBLE CASE
@@ -174,19 +173,5 @@ void APPActorManager::UpdatePuzzleState()
 				Pair.Key->DeactivateOwned();
 			}
 		}
-	}
-}
-
-void APPActorManager::ActivateNextPuzzlePiece()
-{
-	int32 CurrentIndex = 0;
-	for (auto It = PuzzleComponents.CreateIterator(); It; ++It)
-	{
-		if(CurrentIndex == CurrentSolvedIndex)
-		{
-			It->Key->ActivateOwned();
-			break;
-		}
-		++CurrentIndex;
 	}
 }

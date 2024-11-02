@@ -41,8 +41,7 @@ protected:
 	// When the puzzle is completed, block the Trigger Actors that are part of the puzzle
 	UPROPERTY(EditInstanceOnly)
 	bool bBlockPuzzleOnFinished;
-
-	UPROPERTY(EditInstanceOnly)
+	
 	bool bActivate = false;
 
 	// Solving method
@@ -50,7 +49,7 @@ protected:
 	TEnumAsByte<ESolvingMethod> SolvingMethod = Free;
 
 	UPROPERTY() // This is only used for the Sequence & MandatoryOrder solving method
-	int32 CurrentSolvedIndex = 0;
+	int32 CurrentSolvingIndex = 0;
 	
 	UPROPERTY(EditInstanceOnly)
 	TMap<APPActorTrigger*, int32> PuzzleComponents;
@@ -63,8 +62,5 @@ protected:
 	
 	UFUNCTION()
 	void UpdatePuzzleState();
-	
-	UFUNCTION()
-	void ActivateNextPuzzlePiece();
 	
 };
