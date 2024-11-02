@@ -1,6 +1,6 @@
 ## Puzzle Pieces Plugin
 
-Current version: 0.0.2024.1
+Current version: 0.0.2024.2
 
 A bunch of modular Actors that can be combined to create numerous Puzzles.
 
